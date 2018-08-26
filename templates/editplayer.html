@@ -1,0 +1,71 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	<div class="row divider green">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner menu">
+		<div class="col-md-11 col-md-offset-1 padding-none">
+			<h1>Edit Menu Item</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6 col-md-offset-1 padding-top">
+			<form action="#" method = "post">
+				<div class="form-group">
+					<label for="name">Name:</label>
+					<input type ="text" maxlength="100" class="form-control" name="name" value="{{item.name }}">
+
+					<label for="description">Position:</label>
+					<div class="radio">
+					  <label>
+					    <input type="radio" name="position" id="position1" value="Catcher" {% if item.position == 'Catcher'%}checked{%endif%}>Catcher
+					  </label>
+					</div>
+					<div class="radio">
+					  <label>
+					    <input type="radio" name="position" id="position2" value="First Base" {% if item.position == 'First Base' %}checked{%endif%}>First Base
+					  </label>
+					</div>
+					<div class="radio">
+					  <label>
+					    <input type="radio" name="position" id="position3" value="Second Base" {% if item.position == 'Second Base'%}checked{%endif%}>Second Base
+					  </label>
+					</div>
+					<div class="radio">
+					  <label>
+					    <input type="radio" name="position" id="position4" value="Shortstop" {%if item.position =='Shortstop'%}checked{%endif%}>Shortstop
+					  </label>
+					</div>
+					<div class="radio">
+					  <label>
+					    <input type="radio" name="position" id="position5" value="Third Base" {%if item.position =='Third Base'%}checked{%endif%}>Third Base
+					  </label>
+					</div>
+					<div class="radio">
+					  <label>
+					    <input type="radio" name="position" id="position6" value="Outfield" {%if item.position =='Outfield'%}checked{%endif%}>Outfield
+					  </label>
+					</div>
+					<div class="radio">
+					  <label>
+					    <input type="radio" name="position" id="position7" value="Pitcher" {%if item.position =='Pitcher'%}checked{%endif%}>Pitcher
+					  </label>
+					</div>
+
+					<label for="price">Games Played:</label>
+					<div class="input-group">
+						<input type ="text" maxlength="10" class="form-control" name="gamesplayed" value="{{item.games_played}}">
+					</div>
+
+					<button type="submit" class="btn btn-default" id="submit" type="submit">
+					<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Save</button>
+					<a href = '{{url_for('showTeams')}}'>
+						<button class="btn btn-default delete" type="button">
+						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
+					</a>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}

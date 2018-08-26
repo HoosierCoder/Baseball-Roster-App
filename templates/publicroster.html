@@ -1,0 +1,128 @@
+roster-item{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+	<div class="row divider green">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner menu">
+		<div class="col-md-11 col-md-offset-1 padding-none">
+			<h1>{{ team.name }}
+			<figure class="creator">
+				<img src="{{ creator.picture}}">
+				<figcaption>{{ creator.name }}</figcaption>
+			</figure>
+			</h1>
+
+		</div>
+	</div>
+	<div class="row padding-top padding-bottom">
+		<div class="col-md-1"></div>
+		<div class="col-md-11 padding-none">
+
+		</div>
+		<div class="col-md-7"></div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			{% with messages = get_flashed_messages() %}
+				{% if messages %}
+					<ul>
+						{% for message in messages %}
+							 <li> <strong> {{ message }} </strong> </li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+			{% endwith %}
+		</div>
+	</div>
+	{% if items !=[] %}
+		<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-3">
+				<h2>Catchers</h2>
+					{% for i in items %}
+						{% if i.position == 'Catcher' %}
+							<div class="roster-item">
+								<h3>{{i.name}}</h3>
+								<p>{{i.position}}</p>
+								<p class="roster-price">{{i.games_played}} Games</p>
+
+							</div>
+						{% endif %}
+					{% endfor %}
+				<h2>Shortstops</h2>
+					{% for i in items %}
+						{% if i.position == 'Shortstop' %}
+						<div class="roster-item">
+							<h3>{{i.name}}</h3>
+							<p>{{i.position}}</p>
+							<p class="roster-price">{{i.games_played}} Games</p>
+
+						</div>
+						{% endif %}
+					{% endfor %}
+				<h2>Pitcher</h2>
+					{% for i in items %}
+						{% if i.position == 'Pitcher' %}
+						<div class="roster-item">
+							<h3>{{i.name}}</h3>
+							<p>{{i.position}}</p>
+							<p class="roster-price">{{i.games_played}} Games</p>
+
+						</div>
+						{% endif %}
+					{% endfor %}
+			</div>
+			<div class="col-md-4">
+				<h2>First Base</h2>
+					{% for i in items %}
+						{% if i.position == 'First Base' %}
+						<div class="roster-item">
+							<h3>{{i.name}}</h3>
+							<p>{{i.position}}</p>
+							<p class="roster-price">{{i.games_played}} Games</p>
+
+						</div>
+						{% endif %}
+					{% endfor %}
+				<h2>Third Base</h2>
+					{% for i in items %}
+						{% if i.position == 'Third Base' %}
+						<div class="roster-item">
+							<h3>{{i.name}}</h3>
+							<p>{{i.position}}</p>
+							<p class="roster-price">{{i.games_played}} Games</p>
+
+						</div>
+						{% endif %}
+					{% endfor %}
+			</div>
+			<div class="col-md-3">
+				<h2>Second Base</h2>
+					{% for i in items %}
+						{% if i.position == 'Second Base' %}
+						<div class="roster-item">
+							<h3>{{i.name}}</h3>
+							<p>{{i.position}}</p>
+							<p class="roster-price">{{i.games_played}} Games</p>
+
+						</div>
+						{% endif %}
+					{% endfor %}
+				<h2>Outfield</h2>
+					{% for i in items %}
+						{% if i.position == 'Outfield' %}
+						<div class="roster-item">
+							<h3>{{i.name}}</h3>
+							<p>{{i.position}}</p>
+							<p class="roster-price">{{i.games_played}} Games</p>
+
+						</div>
+						{% endif %}
+					{% endfor %}
+			</div>
+			<div class="col-md-1"></div>
+		</div>
+	{% endif %}
+{% endblock %}
