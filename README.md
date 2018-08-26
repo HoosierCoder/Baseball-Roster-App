@@ -1,5 +1,5 @@
 # Baseball Roster App
-This web app is a project for the Udacity [FSND Course](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004).
+This web app is a project for the Udacity [Full Stack Web Developer Course](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004).
 
 ## About
 This app utilizes the Flask framework which accesses a SQL database that populates categories and their items. OAuth2 provides authentication for further CRUD functionality on the application. Currently OAuth2 is implemented for Google Accounts.
@@ -24,7 +24,7 @@ Seperate instructions are provided to get GConnect working also.
 4. Log into Vagrant VM (`vagrant ssh`)
 5. Navigate to /vagrant as instructed in terminal window
 6. The app imports requests which is not on this vm. Run sudo pip install requests
-7. Setup application database `python database_setup.py`
-8. Insert initial rosters by typing python teamrosters.py`
-9. Run application using `python app.py`
+7. Setup application database python database_setup.py
+8. Insert initial rosters by typing python teamrosters.py
+9. Run application by typing python app.py
 10. Access the application locally using http://localhost:5000
