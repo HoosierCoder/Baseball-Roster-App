@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, redirect, jsonify
+from flask import url_for, flash
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import SingletonThreadPool
@@ -37,7 +38,7 @@ def showLogin():
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
-
+# Open a facebook connection for login
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
     if request.args.get('state') != login_session['state']:
@@ -47,29 +48,31 @@ def fbconnect():
     access_token = request.data
     print("access token received %s " % access_token)
 
-
     app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
         'web']['app_id']
     app_secret = json.loads(
         open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
-        app_id, app_secret, access_token)
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type= \
+            fb_exchange_token&client_id=%s&client_secret= \
+            %s&fb_exchange_token=%s' % ( \
+            app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
-
 
     # Use token to get user info from API
     userinfo_url = "https://graph.facebook.com/v2.8/me"
     '''
-        Due to the formatting for the result from the server token exchange we have to
-        split the token first on commas and select the first index which gives us the key : value
-        for the server access token then we split it on colons to pull out the actual token value
-        and replace the remaining quotes with nothing so that it can be used directly in the graph
-        api calls
+        Due to the formatting for the result from the server token exchange
+        we have to split the token first on commas and select the first index
+        which gives us the key : value for the server access token then we
+        split it on colons to pull out the actual token value and replace the
+        remaining quotes with nothing so that it can be used directly in the
+        graph api calls
     '''
     token = result.split(',')[0].split(':')[1].replace('"', '')
 
-    url = 'https://graph.facebook.com/v2.8/me?access_token=%s&fields=name,id,email' % token
+    url = 'https://graph.facebook.com/v2.8/me?access_token= \
+            %s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     # print "url sent for API access:%s"% url
@@ -84,7 +87,8 @@ def fbconnect():
     login_session['access_token'] = token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v2.8/me/picture?access_token=%s&redirect=0&height=200&width=200' % token
+    url = 'https://graph.facebook.com/v2.8/me/picture?access_token= \
+        %s&redirect=0&height=200&width=200' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -104,12 +108,14 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;'
+    output += 'border-radius: 150px;-webkit-border-radius: 150px;'
+    output += '-moz-border-radius: 150px;"> '
 
     flash("Now logged in as %s" % login_session['username'])
     return output
 
-
+# Logout and disconnect the facebook connection
 @app.route('/fbdisconnect')
 def fbdisconnect():
     facebook_id = login_session['facebook_id']
@@ -120,7 +126,7 @@ def fbdisconnect():
     result = h.request(url, 'DELETE')[1]
     return "you have been logged out"
 
-
+# Connect via Google using google tokens
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -173,8 +179,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(json.dumps(
+                        'Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -207,7 +213,9 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;'
+    output += 'border-radius: 150px;'
+    output += '-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
     return output
@@ -215,6 +223,7 @@ def gconnect():
 # User Helper Functions
 
 
+# Create a new application user
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
@@ -224,11 +233,13 @@ def createUser(login_session):
     return user.id
 
 
+# From session infomration, grab the user info
 def getUserInfo(user_id):
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
+# Grab user id
 def getUserID(email):
     try:
         user = session.query(User).filter_by(email=email).one()
@@ -237,8 +248,6 @@ def getUserID(email):
         return None
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
-
-
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
@@ -256,7 +265,8 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(json.dumps(
+                                'Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -270,12 +280,14 @@ def teamRosterJSON(team_id):
     return jsonify(Player=[i.serialize for i in items])
 
 
+# Grab the player info and use JSON to format the information
 @app.route('/team/<int:team_id>/roster/<int:player_id>/JSON')
 def playerJSON(team_id, player_id):
     Roster_Item = session.query(Player).filter_by(id=player_id).one()
     return jsonify(Roster_Item=Roster_Item.serialize)
 
 
+# JSON formatting of the team info to return in the response
 @app.route('/team/JSON')
 def teamsJSON():
     teams = session.query(Team).all()
@@ -293,8 +305,6 @@ def showTeams():
         return render_template('teams.html', teams=teams)
 
 # Create a new team
-
-
 @app.route('/team/new/', methods=['GET', 'POST'])
 def newTeam():
     if 'username' not in login_session:
@@ -310,8 +320,6 @@ def newTeam():
         return render_template('newTeam.html')
 
 # Edit a team
-
-
 @app.route('/team/<int:team_id>/edit/', methods=['GET', 'POST'])
 def editTeam(team_id):
     editedTeam = session.query(
@@ -319,7 +327,9 @@ def editTeam(team_id):
     if 'username' not in login_session:
         return redirect('/login')
     if editedTeam.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to edit this roster. Please create your own team in order to edit.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not authorized \
+                to edit this roster. Please create your own team in order to \
+                edit.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
             editedTeam.name = request.form['name']
@@ -337,7 +347,9 @@ def deleteTeam(team_id):
     if 'username' not in login_session:
         return redirect('/login')
     if teamToDelete.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to delete this team. Please create your own team in order to delete.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not authorized \
+                to delete this team. Please create your own team in order to \
+                delete.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         session.delete(teamToDelete)
         flash('%s Successfully Deleted' % teamToDelete.name)
@@ -346,9 +358,8 @@ def deleteTeam(team_id):
     else:
         return render_template('deleteTeam.html', team=teamToDelete)
 
+
 # Show a team roster
-
-
 @app.route('/team/<int:team_id>/')
 @app.route('/team/<int:team_id>/roster/')
 def showRoster(team_id):
@@ -358,9 +369,11 @@ def showRoster(team_id):
     items = session.query(Player).filter_by(
         team_id=team_id).all()
     if 'username' not in login_session or creator.id != login_session['user_id']:
-        return render_template('publicroster.html', items=items, team=team, creator=creator)
+        return render_template(
+            'publicroster.html', items=items, team=team, creator=creator)
     else:
-        return render_template('roster.html', items=items, team=team, creator=creator)
+        return render_template(
+            'roster.html', items=items, team=team, creator=creator)
 
 
 # Create a new player
@@ -370,10 +383,14 @@ def newPlayer(team_id):
         return redirect('/login')
     team = session.query(Team).filter_by(id=team_id).one()
     if login_session['user_id'] != team.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to add players to this team. Please create your own team in order to add players.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not authorized \
+                to add players to this team. Please create your own team in \
+                order to add players.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
-        newItem = Player(name=request.form['name'], position=request.form['position'], games_played=request.form[
-                           'games_played'], team_id=team_id, user_id=team.user_id)
+        newItem = Player(
+                name=request.form['name'], position=request.form['position'],
+                            games_played=request.form['games_played'],
+                            team_id=team_id, user_id=team.user_id)
         session.add(newItem)
         session.commit()
         flash('New Player %s Successfully added to roster' % (newItem.name))
@@ -382,8 +399,6 @@ def newPlayer(team_id):
         return render_template('newplayer.html', team_id=team_id)
 
 # Edit a player
-
-
 @app.route('/team/<int:team_id>/roster/<int:player_id>/edit', methods=['GET', 'POST'])
 def editPlayer(team_id, player_id):
     if 'username' not in login_session:
@@ -391,7 +406,10 @@ def editPlayer(team_id, player_id):
     editedItem = session.query(Player).filter_by(id=player_id).one()
     team = session.query(Team).filter_by(id=team_id).one()
     if login_session['user_id'] != team.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to edit the roster of this team. Please create your own team to update the roster.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not \
+                authorized to edit the roster of this team. Please \
+                create your own team to update the roster.');}\
+                </script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
             editedItem.name = request.form['name']
@@ -404,18 +422,22 @@ def editPlayer(team_id, player_id):
         flash('Player Successfully Edited')
         return redirect(url_for('showRoster', team_id=team_id))
     else:
-        return render_template('editplayer.html', team_id=team_id, player_id=player_id, item=editedItem)
-
+        return render_template('editplayer.html', team_id=team_id,
+                               player_id=player_id, item=editedItem)
 
 # Delete a player
-@app.route('/team/<int:team_id>/roster/<int:player_id>/delete', methods=['GET', 'POST'])
+@app.route('/team/<int:team_id>/roster/<int:player_id>/delete',
+                                           methods=['GET', 'POST'])
 def deletePlayer(team_id, player_id):
     if 'username' not in login_session:
         return redirect('/login')
     team = session.query(Team).filter_by(id=team_id).one()
     itemToDelete = session.query(Player).filter_by(id=player_id).one()
     if login_session['user_id'] != team.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to delete players from this team. Please create your own team in order to delete players.');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not authorized \
+                to delete players from this team. Please create your own team \
+                in order to delete players.');}\
+                </script><body onload='myFunction()'>"
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
@@ -423,7 +445,6 @@ def deletePlayer(team_id, player_id):
         return redirect(url_for('showRoster', team_id=team_id))
     else:
         return render_template('deleteplayer.html', item=itemToDelete)
-
 
 # Disconnect based on provider
 @app.route('/disconnect')
@@ -446,7 +467,6 @@ def disconnect():
     else:
         flash("You were not logged in")
         return redirect(url_for('showTeams'))
-
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
