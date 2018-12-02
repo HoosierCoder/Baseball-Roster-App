@@ -310,6 +310,10 @@ def newTeam():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
+        if not request.form['name']:
+	    flash('Please add team name')
+            return redirect(url_for('newTeam'))
+        
         newTeam = Team(
             name=request.form['name'], user_id=login_session['user_id'])
         session.add(newTeam)
@@ -387,6 +391,19 @@ def newPlayer(team_id):
                 to add players to this team. Please create your own team in \
                 order to add players.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
+        if not request.form['name']:
+	    flash('Please add player name')
+            return redirect(url_for('newPlayer', team_id=team_id))
+
+        playerPosition = request.form.get("position","")
+        if playerPosition == "":
+            flash('Please select player position')
+            return redirect(url_for('newPlayer', team_id=team_id))
+            
+        if not request.form['games_played']:
+	    flash('Please enter games played')
+            return redirect(url_for('newPlayer', team_id=team_id))
+        
         newItem = Player(
                 name=request.form['name'], position=request.form['position'],
                             games_played=request.form['games_played'],
@@ -411,6 +428,23 @@ def editPlayer(team_id, player_id):
                 create your own team to update the roster.');}\
                 </script><body onload='myFunction()'>"
     if request.method == 'POST':
+        if not request.form['name']:
+	    flash('Please add player name')
+            return redirect(url_for('editPlayer', team_id=team_id, \
+                                    player_id=player_id))
+
+        playerPosition = request.form.get("position","")
+        if playerPosition == "":
+            flash('Please select player position')
+            return redirect(url_for('editPlayer', team_id=team_id, \
+                                    player_id=player_id))
+
+        gamesPlayed = request.form.get("gamesplayed","")   
+        if gamesPlayed == "":
+	    flash('Please enter games played')
+            return redirect(url_for('editPlayer', team_id=team_id, \
+                                    player_id=player_id))
+        
         if request.form['name']:
             editedItem.name = request.form['name']
         if request.form['position']:
